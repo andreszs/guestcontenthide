@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "Hide post images, links, attachments and signatures from guests or bots.",
     "homepage": "https://github.com/andreszs/guestcontenthide",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "time": "2017-11-07",
     "license": "GPL-2.0",
     "authors": [
