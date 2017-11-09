@@ -29,6 +29,19 @@ class main_listener implements EventSubscriberInterface
 	/* @var \phpbb\language\language */
 	protected $language;
 
+	/* @array $img_regex */
+	var $img_regex = array(
+		'~<img[^>]*>.*?</img>~i',
+		'~\[img[^>]*?\].*?\[/img[^>]*?\]~i'
+	);
+
+	/* @array $url_regex */
+	var $url_regex = array(
+		'~<a[^>]*>.*?</a>~i',
+		'~<url[^>]*>.*?</url>~i',
+		'~\[url[^>]*?\].*?\[/url[^>]*?\]~i'
+	);
+
 	/**
 	* Constructor
 	*
@@ -84,23 +97,38 @@ class main_listener implements EventSubscriberInterface
 
 		$row = $event['rowset_data'];
 
+		//echo '<h2>row:</h2>';
+		//echo '<pre>'.$row['post_text'].'</pre>';
+
 		if($this->user->data['is_bot']){
 			/* Handling for bots */
 
 			if($this->config['gch_b_hide_img'] == 1){
 				// Hide images
-				$row['post_text'] = preg_replace('~<IMG [^>]*>.*?</IMG>~i', $this->language->lang('GCH_HIDDEN_IMG'), $row['post_text']);
-			}else if($this->config['gch_b_hide_img'] == 2 and preg_match('~<IMG\b[^>]*>(.*?)</IMG>~i', $row['post_text']) > 0){
-				// Hide post content
-				$row['post_text'] = $this->language->lang('GCH_HIDDEN_POST');
+				foreach($this->img_regex as $regex){
+					$row['post_text'] = preg_replace($regex, $this->language->lang('GCH_HIDDEN_IMG'), $row['post_text']);
+				}
+			}else if($this->config['gch_b_hide_img'] == 2){
+				// Hide post content if image present
+				foreach($this->img_regex as $regex){
+					if(preg_match($regex, $row['post_text']) > 0){
+						$row['post_text'] = $this->language->lang('GCH_HIDDEN_POST');
+					}
+				}
 			}
 
 			if($this->config['gch_b_hide_url'] == 1){
 				// Hide links
-				$row['post_text'] = preg_replace('~<URL [^>]*>.*?</URL>~i', $this->language->lang('GCH_HIDDEN_URL'), $row['post_text']);
-			}else if($this->config['gch_b_hide_url'] == 2 and preg_match('~<URL\b[^>]*>(.*?)</URL>~i', $row['post_text']) > 0){
-				// Hide post content
-				$row['post_text'] = $this->language->lang('GCH_HIDDEN_POST');
+				foreach($this->url_regex as $regex){
+					$row['post_text'] = preg_replace($regex, $this->language->lang('GCH_HIDDEN_URL'), $row['post_text']);
+				}
+			}else if($this->config['gch_b_hide_url'] == 2){
+				// Hide post content if link present
+				foreach($this->url_regex as $regex){
+					if(preg_match($regex, $row['post_text']) > 0){
+						$row['post_text'] = $this->language->lang('GCH_HIDDEN_POST');
+					}
+				}
 			}
 
 			if($this->config['gch_b_hide_sig'] == 1){
@@ -113,18 +141,30 @@ class main_listener implements EventSubscriberInterface
 
 			if($this->config['gch_g_hide_img'] == 1){
 				// Hide images
-				$row['post_text'] = preg_replace('~<IMG [^>]*>.*?</IMG>~i', $this->language->lang('GCH_HIDDEN_IMG'), $row['post_text']);
-			}else if($this->config['gch_g_hide_img'] == 2 and preg_match('~<IMG\b[^>]*>(.*?)</IMG>~i', $row['post_text']) > 0){
-				// Hide post content
-				$row['post_text'] = $this->language->lang('GCH_HIDDEN_POST');
+				foreach($this->img_regex as $regex){
+					$row['post_text'] = preg_replace($regex, $this->language->lang('GCH_HIDDEN_IMG'), $row['post_text']);
+				}
+			}else if($this->config['gch_g_hide_img'] == 2){
+				// Hide post content if image present
+				foreach($this->img_regex as $regex){
+					if(preg_match($regex, $row['post_text']) > 0){
+						$row['post_text'] = $this->language->lang('GCH_HIDDEN_POST');
+					}
+				}
 			}
 
 			if($this->config['gch_g_hide_url'] == 1){
 				// Hide links
-				$row['post_text'] = preg_replace('~<URL [^>]*>.*?</URL>~i', $this->language->lang('GCH_HIDDEN_URL'), $row['post_text']);
-			}else if($this->config['gch_g_hide_url'] == 2 and preg_match('~<URL\b[^>]*>(.*?)</URL>~i', $row['post_text']) > 0){
-				// Hide post content
-				$row['post_text'] = $this->language->lang('GCH_HIDDEN_POST');
+				foreach($this->url_regex as $regex){
+					$row['post_text'] = preg_replace($regex, $this->language->lang('GCH_HIDDEN_URL'), $row['post_text']);
+				}
+			}else if($this->config['gch_g_hide_url'] == 2){
+				// Hide post content if link present
+				foreach($this->url_regex as $regex){
+					if(preg_match($regex, $row['post_text']) > 0){
+						$row['post_text'] = $this->language->lang('GCH_HIDDEN_POST');
+					}
+				}
 			}
 
 			if($this->config['gch_g_hide_sig'] == 1){
